@@ -1,6 +1,5 @@
 const express = require('express')
 const mongoose = require('mongoose') //Package for mongodb
-
 const ShortUrl = require('./models/shortUrl')
 const app = express()
 const jwt = require('jsonwebtoken');
@@ -19,7 +18,7 @@ const options = {
 };
 app.use(bodyParser.urlencoded(options));
 
-mongoose.connect('mongodb://localhost:27017', {
+mongoose.connect(process.env.MONGO||'mongodb://localhost:27017', {
   useNewUrlParser: true, useUnifiedTopology: true
 })
 app.use(express.urlencoded({ extended: false }))
