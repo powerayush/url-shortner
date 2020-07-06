@@ -18,57 +18,66 @@ const options = {
 };
 app.use(bodyParser.urlencoded(options));
 
-mongoose.connect(process.env.MONGO||'mongodb://localhost:27017', {
+console.log("Server Started....")
+try {
+  mongoose.connect(process.env.MONGO||'mongodb://localhost:27017', {
   useNewUrlParser: true, useUnifiedTopology: true
-})
-app.use(express.urlencoded({ extended: false }))
-
-// To fetch the token 
-app.post('/api/login',(req,res) => {
-  const user = {
-    id: 1,
-    username: 'onsurity',
-    email: 'xyz123@gmail.com'
-  }
-  jwt.sign({user:user},'secretkey',(err,token)=>{
-    res.json({
-      token:token
-    });
-  }); 
-});
-
-// Verify jwt Token
-function verifyToken(req,res,next){
-  const bearerHeader = req.headers['authorization'];
-  if(typeof bearerHeader !== 'undefined'){
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
-    next();
-  } else {
-    res.sendStatus(403)
-  }
-}
-
-app.get('/', (req, res) => {
-  const shortUrls = ShortUrl.find()
-  res.sendStatus({ shortUrls: shortUrls });
-  res.send('index', { shortUrls: shortUrls })
-})
-
-// Post the full url and customized short url (optional)
-app.post('/shortUrls', verifyToken, async(req, res) => {
-  await ShortUrl.create({ full: req.body.fullUrl, short: req.body.shortUrl },function(err,data){
-    res.send("Short Url is " + data.short);
+  },function(err) {
+    if (err) { return console.error('failed');}
   })
-  
-})
 
-// Get the full url corresponding to short url which is generated in the post function
-app.get('/:shortUrl', async (req, res) => {
-  const shortUrl = await ShortUrl.findOne({ short: req.params.shortUrl })
-  if (shortUrl == null) return res.sendStatus(404)
-  res.send(shortUrl.full)
-})
+
+  app.use(express.urlencoded({ extended: false }))
+
+  // To fetch the token 
+  app.post('/api/login',(req,res) => {
+    const user = {
+      id: 1,
+      username: 'onsurity',
+      email: 'xyz123@gmail.com'
+    }
+    jwt.sign({user:user},'secretkey',(err,token)=>{
+      res.json({
+        token:token
+      });
+    }); 
+  });
+
+  // Verify jwt Token
+  function verifyToken(req,res,next){
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== 'undefined'){
+      const bearer = bearerHeader.split(' ');
+      const bearerToken = bearer[1];
+      req.token = bearerToken;
+      next();
+    } else {
+      res.sendStatus(403)
+    }
+  }
+
+  app.get('/', (req, res) => {
+    const shortUrls = ShortUrl.find()
+    res.sendStatus({ shortUrls: shortUrls });
+    res.send('index', { shortUrls: shortUrls })
+  })
+
+  // Post the full url and customized short url (optional)
+  app.post('/shortUrls', verifyToken, async(req, res) => {
+    await ShortUrl.create({ full: req.body.fullUrl, short: req.body.shortUrl },function(err,data){
+      res.send("Short Url is " + data.short);
+    })
+    
+  })
+
+  // Get the full url corresponding to short url which is generated in the post function
+  app.get('/:shortUrl', async (req, res) => {
+    const shortUrl = await ShortUrl.findOne({ short: req.params.shortUrl })
+    if (shortUrl == null) return res.sendStatus(404)
+    res.send(shortUrl.full)
+  })
+} catch (error){
+  console.log(error);
+}
 app.use(limiter);
-app.listen(process.env.PORT || 5000);
+app.listen(process.env.PORT || 2000);

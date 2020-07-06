@@ -20,7 +20,7 @@ $ sudo mongod --dbpath ~/.cuis-db/
 
 4. Start url-shortener
 ```
-$ npm run devStart
+$ node server.js
 ```
 
 5. Install robo3t to visualize the mongo database collections

@@ -1,7 +1,7 @@
-FROM node:boron
+FROM node:latest
 COPY ./package.json .
-RUN apt-get update && apt-get install -y mongodb
+RUN echo fs.inotify.max_user_watches=524288
 RUN npm install
 COPY . .
-ENTRYPOINT [ "npm", "run", "devStart" ]
+ENTRYPOINT ["node","server.js"]
 EXPOSE 5000
